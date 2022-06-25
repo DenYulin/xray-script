@@ -129,7 +129,7 @@ statusText() {
 }
 
 normalizeVersion() {
-	latestXrayVer=v$(curl -Ls "https://data.jsdelivr.com/v1/package/resolve/gh/XTLS/Xray-core" | grep '"version":' | sed -E 's/.*"([^"]+)".*/\1/')
+	latestXrayVer=v$(curl -Ls "http://data.jsdelivr.com/v1/package/resolve/gh/XTLS/Xray-core" | grep '"version":' | sed -E 's/.*"([^"]+)".*/\1/')
 	if [ -n "$1" ]; then
 		case "$1" in
 			v*) echo "$1" ;;
@@ -146,10 +146,11 @@ getVersion() {
 	VER=$(/usr/local/bin/xray version 2>/dev/null | head -n1 | awk '{print $2}')
 	RETVAL=$?
 	CUR_VER="$(normalizeVersion "$(echo "$VER" | head -n 1 | cut -d " " -f2)")"
-	TAG_URL="https://data.jsdelivr.com/v1/package/resolve/gh/XTLS/Xray-core"
+	TAG_URL="http://data.jsdelivr.com/v1/package/resolve/gh/XTLS/Xray-core"
 	NEW_VER="$(normalizeVersion "$(curl -s "${TAG_URL}" --connect-timeout 10 | grep 'version' | cut -d\" -f4)")"
 
 	if [[ $? -ne 0 ]] || [[ $NEW_VER == "" ]]; then
+		red "Newest Xray version is $NEW_VER "
 		red "检测 Xray 版本失败，可能是VPS网络错误，请检查后重试"
 		return 3
 	elif [[ $RETVAL -ne 0 ]]; then
